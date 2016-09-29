@@ -2,8 +2,8 @@
 
 namespace Crust\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreatePermission extends FormRequest
 {
@@ -20,7 +20,8 @@ class CreatePermission extends FormRequest
     /**
      * Format the errors from the given Validator instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     *
      * @return array
      */
     protected function formatErrors(Validator $validator)
@@ -37,7 +38,7 @@ class CreatePermission extends FormRequest
     {
         return [
             'permit_name' => 'required',
-            'permit_code' => 'required'
+            'permit_code' => 'required',
         ];
     }
 
@@ -48,9 +49,9 @@ class CreatePermission extends FormRequest
      */
     public function attributes()
     {
-       return [
+        return [
             'permit_name' => 'Permit Name',
-            'permit_code' => 'Permit Code'
+            'permit_code' => 'Permit Code',
         ];
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Crust\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Crust\Contracts\HumanInterface;
 use Crust\Requests\CreateUser;
 use Crust\Requests\UpdateUser;
-use Crust\Contracts\HumanInterface;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class CrustUserController extends Controller
 {
@@ -33,9 +33,10 @@ class CrustUserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Crust\Contracts\HumanInterface $human
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Crust\Requests\CreateUser $createUser
+     * @param \Crust\Contracts\HumanInterface $human
+     * @param \Illuminate\Http\Request        $request
+     * @param \Crust\Requests\CreateUser      $createUser
+     *
      * @return \Illuminate\Http\Response
      */
     public function store(HumanInterface $human, Request $request, CreateUser $createUser)
@@ -44,14 +45,15 @@ class CrustUserController extends Controller
             ->modifyHumanRole($human->getValidPermit($request, 'role'))
             ->modifyHumanPermit($human->getValidatePermitCodes($request, 'permit'))
             ->modifyHumanBan($human->getValidatePermitCodes($request, 'ban'))
-            ->get();        
+            ->get();
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @param  \Crust\Contracts\HumanInterface $human
+     * @param int                             $id
+     * @param \Crust\Contracts\HumanInterface $human
+     *
      * @return \Illuminate\Http\Response
      */
     public function show($id, HumanInterface $human)
@@ -62,26 +64,28 @@ class CrustUserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @param  \Crust\Contracts\HumanInterface $human
+     * @param int                             $id
+     * @param \Crust\Contracts\HumanInterface $human
+     *
      * @return \Illuminate\Http\Response
      */
     public function edit($id, HumanInterface $human)
     {
-         return $human->get($id);
+        return $human->get($id);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Crust\Contracts\HumanInterface $human
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Crust\Requests\UpdateUser $updateUser
-     * @param  int  $id
+     * @param \Crust\Contracts\HumanInterface $human
+     * @param \Illuminate\Http\Request        $request
+     * @param \Crust\Requests\UpdateUser      $updateUser
+     * @param int                             $id
+     *
      * @return \Illuminate\Http\Response
      */
     public function update(HumanInterface $human, Request $request, UpdateUser $updateUser, $id)
-    {   
+    {
         return $human->modify($request->input(), $id)
             ->modifyHumanRole($human->getValidPermit($request, 'role'))
             ->modifyHumanPermit($human->getValidatePermitCodes($request, 'permit'))
@@ -92,13 +96,13 @@ class CrustUserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \Crust\Contracts\HumanInterface $human
-     * @param  int  $id
+     * @param \Crust\Contracts\HumanInterface $human
+     * @param int                             $id
+     *
      * @return \Illuminate\Http\Response
      */
     public function destroy(HumanInterface $human, $id)
     {
         return $human->delete($id);
     }
-
 }

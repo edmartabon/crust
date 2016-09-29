@@ -2,8 +2,8 @@
 
 namespace Crust\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateUser extends FormRequest
 {
@@ -20,7 +20,8 @@ class CreateUser extends FormRequest
     /**
      * Format the errors from the given Validator instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     *
      * @return array
      */
     protected function formatErrors(Validator $validator)
@@ -40,7 +41,7 @@ class CreateUser extends FormRequest
             'email'      => 'required|email|unique:users,email',
             'password'   => 'required|min:8',
             'first_name' => 'required',
-            'last_name'  => 'required'
+            'last_name'  => 'required',
         ];
     }
 
@@ -51,12 +52,12 @@ class CreateUser extends FormRequest
      */
     public function attributes()
     {
-       return [
+        return [
             'username'  => 'Username',
             'email'     => 'Email',
             'password'  => 'Password',
             'firstname' => 'Firstname',
-            'lastname'  => 'Lastname'
+            'lastname'  => 'Lastname',
         ];
     }
 }

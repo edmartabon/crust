@@ -7,11 +7,10 @@ use Illuminate\Support\ServiceProvider;
 
 class CrustServiceProvider extends ServiceProvider
 {
-
     /**
-     * Get the main base path of packages;
+     * Get the main base path of packages;.
      */
-    private $root = __DIR__ . '/../';
+    private $root = __DIR__.'/../';
 
     /**
      * Bootstrap the application services.
@@ -40,12 +39,12 @@ class CrustServiceProvider extends ServiceProvider
     public function publish()
     {
         $this->publishes([
-            $this->root . 'Data/config' => $this->app->configPath(),
+            $this->root.'Data/config' => $this->app->configPath(),
         ], 'crust');
     }
 
     /**
-     * Bind crust interface to human
+     * Bind crust interface to human.
      *
      * @return void
      */
@@ -56,35 +55,35 @@ class CrustServiceProvider extends ServiceProvider
             'Crust\Human'
         );
     }
-    
+
     private function bindHuman()
     {
-        $this->app->bind('Human', function() {
-            return new \Crust\Human;
+        $this->app->bind('Human', function () {
+            return new \Crust\Human();
         });
     }
 
     private function loadMigration()
     {
-        $this->loadMigrationsFrom($this->root . 'Data/database/migration');
+        $this->loadMigrationsFrom($this->root.'Data/database/migration');
     }
 
     private function loadView()
     {
-        $this->loadViewsFrom($this->root . 'Data/resources/view', 'crust');
+        $this->loadViewsFrom($this->root.'Data/resources/view', 'crust');
     }
 
     /**
-     * Load crust route module
+     * Load crust route module.
      *
      * @return void
      */
     private function loadRoute()
     {
         if ($this->getConfig('crust.page')) {
-            require $this->root . 'Data/routes/route.php';
+            require $this->root.'Data/routes/route.php';
         }
-        require $this->root . 'Data/consoles/crustcommand.php';
+        require $this->root.'Data/consoles/crustcommand.php';
     }
 
     private function getConfig($config)
@@ -92,7 +91,7 @@ class CrustServiceProvider extends ServiceProvider
         if (!is_null($config = Config::get($config))) {
             return $config;
         }
+
         return false;
     }
-
 }

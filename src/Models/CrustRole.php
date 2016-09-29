@@ -19,11 +19,12 @@ class CrustRole extends Model
      * @var bool
      */
     public $timestamps = false;
-    
+
     /**
      * Set the user's permit code.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return void
      */
     public function setPermitCodesAttribute($value)
@@ -34,12 +35,12 @@ class CrustRole extends Model
     /**
      * Get the user's permit code.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return object
      */
     public function getPermitCodesAttribute($value)
     {
         return (is_null($value)) ? json_decode(json_encode(['permit' => []])) : json_decode(strtolower($value));
     }
-
 }

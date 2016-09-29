@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CrustMigrations extends Migration
 {
@@ -37,7 +37,6 @@ class CrustMigrations extends Migration
             $table->string('permit_name');
             $table->string('permit_code');
         });
-
     }
 
     /**

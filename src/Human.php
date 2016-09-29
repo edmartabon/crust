@@ -4,426 +4,488 @@ namespace Crust;
 
 use Auth;
 use Config;
-use Request;
-use Redirect;
-use Crust\Models\Users;
-use Crust\Models\CrustRole;
-use Crust\Models\CrustPermit;
-use Crust\Modules\Permission;
 use Crust\Contracts\HumanInterface;
+use Crust\Models\CrustPermit;
+use Crust\Models\CrustRole;
+use Crust\Models\Users;
+use Crust\Modules\Permission;
+use Redirect;
+use Request;
 
 class Human implements HumanInterface
 {
-	
-	use Permission;
+    use Permission;
 
-	/**
-	 * Get the last executed user
-	 */
-	public $user;
+    /**
+     * Get the last executed user.
+     */
+    public $user;
 
-	/**
-	 * Set new auth provider a new model
-	 */
-	function __construct()
-	{
-		Config::set(['auth.providers.users.model' => 'Crust\Models\Users']);
-	}
+    /**
+     * Set new auth provider a new model.
+     */
+    public function __construct()
+    {
+        Config::set(['auth.providers.users.model' => 'Crust\Models\Users']);
+    }
 
-	/**
-	 * Create new user
-	 *
-	 * @param array $credential
-	 * @return $this
-	 */
-	public function add(array $credential)
-	{
-		$user = Users::create($credential);
-		$user->save();
+    /**
+     * Create new user.
+     *
+     * @param array $credential
+     *
+     * @return $this
+     */
+    public function add(array $credential)
+    {
+        $user = Users::create($credential);
+        $user->save();
 
-		$this->user = $user;
-		return $this;
-	}
+        $this->user = $user;
 
-	/**
-	 * Modify user information
-	 *
-	 * @param array $credential
-	 * @param integer $userId
-	 * @return object
-	 */
-	public function modify(array $credential, $userId = null)
-	{
-		if (is_null($userId)) $userId = $this->user->id;
+        return $this;
+    }
 
-		$user = Users::find($userId);
+    /**
+     * Modify user information.
+     *
+     * @param array $credential
+     * @param int   $userId
+     *
+     * @return object
+     */
+    public function modify(array $credential, $userId = null)
+    {
+        if (is_null($userId)) {
+            $userId = $this->user->id;
+        }
 
-		foreach($credential as $field => $value) {
-			if ($field !== 'permit_codes') $user->$field = $value;
-		}
-		$user->save();
+        $user = Users::find($userId);
 
-		$this->user = $user;
-		return $this;
-	}
+        foreach ($credential as $field => $value) {
+            if ($field !== 'permit_codes') {
+                $user->$field = $value;
+            }
+        }
+        $user->save();
 
-	/**
-	 * Get user's information by id
-	 *
-	 * @param integer $userid
-	 * @return array
-	 */
-	public function get($userId = null)
-	{
-		if (is_null($userId)) $userId = $this->user->id;
+        $this->user = $user;
 
-		return Users::find($userId)->toArray();
-	}
+        return $this;
+    }
 
-	/**
-	 * Get all registered users
-	 *
-	 * @return array
-	 */
-	public function getAll()
-	{
-		return Users::all();
-	}
+    /**
+     * Get user's information by id.
+     *
+     * @param int $userid
+     *
+     * @return array
+     */
+    public function get($userId = null)
+    {
+        if (is_null($userId)) {
+            $userId = $this->user->id;
+        }
 
-	/**
-	 * return the user model
-	 *
-	 * @return Crust\Models\Users
-	 */
-	public function getHumanRaw()
-	{
-		return Users::query();
-	}
+        return Users::find($userId)->toArray();
+    }
 
-	/**
-	 * Get the current user log
-	 *
-	 * @return array
-	 */
-	public function currentHuman()
-	{
-		return Auth::user();
-	}
+    /**
+     * Get all registered users.
+     *
+     * @return array
+     */
+    public function getAll()
+    {
+        return Users::all();
+    }
 
-	/**
-	 * Delete user 
-	 *
-	 * @param integer $userId
-	 * @return void
-	 */
-	public function delete($userId)
-	{
-		Users::destroy($userId);
-	}
+    /**
+     * return the user model.
+     *
+     * @return Crust\Models\Users
+     */
+    public function getHumanRaw()
+    {
+        return Users::query();
+    }
 
-	/**
-	 * Get user permit codes
-	 *
-	 * @param integer $userId
-	 * @return object
-	 */
-	public function getHumanPermitCodes($userId = null)
-	{
-		$user = $this->currentHuman();
-		if (!is_null($userId)) $user = Users::find($userId);
+    /**
+     * Get the current user log.
+     *
+     * @return array
+     */
+    public function currentHuman()
+    {
+        return Auth::user();
+    }
 
-		if ($user && !is_null($user->permit_codes)) {
-			return $user->permit_codes;
-		}
-		return false;
-	}
+    /**
+     * Delete user.
+     *
+     * @param int $userId
+     *
+     * @return void
+     */
+    public function delete($userId)
+    {
+        Users::destroy($userId);
+    }
 
-	/**
-	 * Get user role
-	 * 
-	 * @param integer $userId
-	 * @return bool
-	 */
-	public function getHumanRole($userId = null)
-	{
-		if (is_null($userId)) {
-			if ($this->user) $userId = $this->user->id;
-			else if ($this->currentHuman()) $userId = $this->currentHuman()->id;
-			else return [];
-		}
+    /**
+     * Get user permit codes.
+     *
+     * @param int $userId
+     *
+     * @return object
+     */
+    public function getHumanPermitCodes($userId = null)
+    {
+        $user = $this->currentHuman();
+        if (!is_null($userId)) {
+            $user = Users::find($userId);
+        }
 
-		if ($userPermitCodes = $this->getHumanPermitCodes($userId)) {
-			if (isset($userPermitCodes->role)) {
-				return $userPermitCodes->role;
-			}
-			return [];
-		}
-		else return [];
-	}
+        if ($user && !is_null($user->permit_codes)) {
+            return $user->permit_codes;
+        }
 
-	/**
-	 * Modify user permission role
-	 * 
-	 * @param array $credential
-	 * @param integer $userId
-	 * @return object
-	 */
-	public function modifyHumanRole($credential, $userId = null)
-	{	
-		return $this->updateUserPermission($credential, 'role', $userId);
-	}
+        return false;
+    }
 
-	/**
-	 * return the role model
-	 *
-	 * @return Crust\Models\CrustRole
-	 */
-	public function getHumanRoleRaw()
-	{
-		return CrustRole::query();
-	}
+    /**
+     * Get user role.
+     *
+     * @param int $userId
+     *
+     * @return bool
+     */
+    public function getHumanRole($userId = null)
+    {
+        if (is_null($userId)) {
+            if ($this->user) {
+                $userId = $this->user->id;
+            } elseif ($this->currentHuman()) {
+                $userId = $this->currentHuman()->id;
+            } else {
+                return [];
+            }
+        }
 
-	/**
-	 * Get user permit
-	 * 
-	 * @param integer $userId
-	 * @return bool
-	 */
-	public function getHumanPermit($userId = null)
-	{
-		if (is_null($userId)) {
-			if ($this->user) $userId = $this->user->id;
-			else if ($this->currentHuman()) $userId = $this->currentHuman()->id;
-			else return [];
-		}
+        if ($userPermitCodes = $this->getHumanPermitCodes($userId)) {
+            if (isset($userPermitCodes->role)) {
+                return $userPermitCodes->role;
+            }
 
-		if ($userPermitCodes = $this->getHumanPermitCodes($userId)) {
-			if (isset($userPermitCodes->permit)) {
-				return $userPermitCodes->permit;
-			}
-			return [];
-		}
-		else return [];
-	}
+            return [];
+        } else {
+            return [];
+        }
+    }
 
-	/**
-	 * Modify user permission permit
-	 * 
-	 * @param array $credential
-	 * @param integer $userId
-	 * @return object
-	 */
-	public function modifyHumanPermit($credential, $userId = null)
-	{
-		return $this->updateUserPermission($credential, 'permit', $userId);
-	}
+    /**
+     * Modify user permission role.
+     *
+     * @param array $credential
+     * @param int   $userId
+     *
+     * @return object
+     */
+    public function modifyHumanRole($credential, $userId = null)
+    {
+        return $this->updateUserPermission($credential, 'role', $userId);
+    }
 
-	/**
-	 * return the permit model
-	 *
-	 * @return Crust\Models\CrustPermit
-	 */
-	public function getHumanPermitRaw()
-	{
-		return CrustPermit::query();
-	}
+    /**
+     * return the role model.
+     *
+     * @return Crust\Models\CrustRole
+     */
+    public function getHumanRoleRaw()
+    {
+        return CrustRole::query();
+    }
 
-	/**
-	 * Get user permit
-	 * 
-	 * @param integer $userId
-	 * @return bool
-	 */
-	public function getHumanBan($userId = null)
-	{
-		if (is_null($userId)) {
-			if ($this->user) $userId = $this->user->id;
-			else if ($this->currentHuman()) $userId = $this->currentHuman()->id;
-			else return [];
-		}
-		
-		if ($userPermitCodes = $this->getHumanPermitCodes($userId)) {
-			if (isset($userPermitCodes->ban)) {
-				return $userPermitCodes->ban;
-			}
-			return [];
-		}
-		else return [];
-	}
+    /**
+     * Get user permit.
+     *
+     * @param int $userId
+     *
+     * @return bool
+     */
+    public function getHumanPermit($userId = null)
+    {
+        if (is_null($userId)) {
+            if ($this->user) {
+                $userId = $this->user->id;
+            } elseif ($this->currentHuman()) {
+                $userId = $this->currentHuman()->id;
+            } else {
+                return [];
+            }
+        }
 
-	/**
-	 * Modify user permission ban
-	 * 
-	 * @param array $credential
-	 * @param integer $userId
-	 * @return object
-	 */
-	public function modifyHumanBan($credential, $userId = null)
-	{
-		return $this->updateUserPermission($credential, 'ban', $userId);
-	}
+        if ($userPermitCodes = $this->getHumanPermitCodes($userId)) {
+            if (isset($userPermitCodes->permit)) {
+                return $userPermitCodes->permit;
+            }
 
-	/**
-	 * Update user's permission
-	 *
-	 * @param array $credential
-	 * @param string $type
-	 * @param null $userId
-	 * @return object
-	 */
-	private function updateUserPermission($credential, $type, $userId = null)
-	{
+            return [];
+        } else {
+            return [];
+        }
+    }
 
-		if (is_null($userId)) $userId = $this->user->id;
+    /**
+     * Modify user permission permit.
+     *
+     * @param array $credential
+     * @param int   $userId
+     *
+     * @return object
+     */
+    public function modifyHumanPermit($credential, $userId = null)
+    {
+        return $this->updateUserPermission($credential, 'permit', $userId);
+    }
 
-		$user = Users::find($userId);
-		$user->permit_codes = $this->setPermissionItem($user, $type, $credential);
-		$user->save();
+    /**
+     * return the permit model.
+     *
+     * @return Crust\Models\CrustPermit
+     */
+    public function getHumanPermitRaw()
+    {
+        return CrustPermit::query();
+    }
 
-		$this->user = $user;
-		return $this;
-	}
+    /**
+     * Get user permit.
+     *
+     * @param int $userId
+     *
+     * @return bool
+     */
+    public function getHumanBan($userId = null)
+    {
+        if (is_null($userId)) {
+            if ($this->user) {
+                $userId = $this->user->id;
+            } elseif ($this->currentHuman()) {
+                $userId = $this->currentHuman()->id;
+            } else {
+                return [];
+            }
+        }
 
-	/**
-	 * Get the main item for permission
-	 * 
-	 * @param object $user
-	 * @param string $type
-	 * @param array  $credential
-	 * @return array
-	 */
-	private function setPermissionItem($user, $type, $credential)
-	{	
-		$items = [];
-		foreach($user->permit_codes as $item => $value) {
-			$items[$item] = $value;
-		}
-		$items[$type] = $credential;
-		return $items;
-	}
+        if ($userPermitCodes = $this->getHumanPermitCodes($userId)) {
+            if (isset($userPermitCodes->ban)) {
+                return $userPermitCodes->ban;
+            }
 
-	/**
-	 * Attempt to log user
-	 *
-	 * @param array $credential
-	 * @return bool
-	 */
-	public function auth(array $credential, $return = true)
-	{
-		if ($this->isAuth()) {
-			if (!$return) return true;
-			return $this->moveHuman();
-		}
+            return [];
+        } else {
+            return [];
+        }
+    }
 
-		if (Auth::attempt($credential)) {
-			if (!$return) return true;
-		}
-		if (!$return) return true;
-		return $this->moveAuthHuman();
-	}
+    /**
+     * Modify user permission ban.
+     *
+     * @param array $credential
+     * @param int   $userId
+     *
+     * @return object
+     */
+    public function modifyHumanBan($credential, $userId = null)
+    {
+        return $this->updateUserPermission($credential, 'ban', $userId);
+    }
 
-	/**
-	 * Redirect user to designated page
-	 *
-	 * @return response
-	 */
-	public function moveHuman()
-	{
-		return Redirect::to($this->getRedirect());
-	}
+    /**
+     * Update user's permission.
+     *
+     * @param array  $credential
+     * @param string $type
+     * @param null   $userId
+     *
+     * @return object
+     */
+    private function updateUserPermission($credential, $type, $userId = null)
+    {
+        if (is_null($userId)) {
+            $userId = $this->user->id;
+        }
 
-	/**
-	 * Check if ajax request and send response
-	 *
-	 * @return response
-	 */
-	private function moveAuthHuman()
-	{
-		if (Request::ajax()) return $this->moveAuthHumanAjax();
-		return $this->moveAuthHumanRedirect();
-	}
+        $user = Users::find($userId);
+        $user->permit_codes = $this->setPermissionItem($user, $type, $credential);
+        $user->save();
 
-	/**
-	 * 
-	 */
-	private function moveAuthHumanRedirect()
-	{
-		if (Auth::check()) {
-			return Redirect::to($this->getRedirect());
-		}
+        $this->user = $user;
 
-		return Redirect::back()->withErrors([
-    		'Username or password incorrect.'
-    	]);
-	}
+        return $this;
+    }
 
-	/**
-	 * Return json response if authentication
-	 * request is ajax
-	 *
-	 * @return array
-	 */
-	private function moveAuthHumanAjax()
-	{
-		if (Auth::check()) {
-			return [
-				'success'  => true,
-				'redirect' => $this->getRedirect()
-			];
-		}
-		return ['success'  => false];
-	}
+    /**
+     * Get the main item for permission.
+     *
+     * @param object $user
+     * @param string $type
+     * @param array  $credential
+     *
+     * @return array
+     */
+    private function setPermissionItem($user, $type, $credential)
+    {
+        $items = [];
+        foreach ($user->permit_codes as $item => $value) {
+            $items[$item] = $value;
+        }
+        $items[$type] = $credential;
 
-	/**
-	 * Check if user is authenticated
-	 *
-	 * @return bool
-	 */
-	public function isAuth()
-	{
-		if (Auth::check()) return true;
-		return false;
-	}
+        return $items;
+    }
 
-	/**
-	 * Destroy user's session
-	 * 
-	 * @return void
-	 */
-	public function logout()
-	{
-		Auth::logout();
-		return $this->moveHuman();
-	}
+    /**
+     * Attempt to log user.
+     *
+     * @param array $credential
+     *
+     * @return bool
+     */
+    public function auth(array $credential, $return = true)
+    {
+        if ($this->isAuth()) {
+            if (!$return) {
+                return true;
+            }
 
-	/**
-	 * Get redirect path if user successfully login
-	 *
-	 * @return string
-	 */
-	public function getRedirect()
-	{	
-		if ($this->getHumanRole() && $this->getConfigRedirect()) {
-			foreach($this->getConfigRedirect() as $role => $redirect) {
-				if (in_array(strtolower($role), $this->getHumanRole())) {
-					return $redirect;
-				}
-			}
-			return '/';
-		}	
-		return '/';
-	}
+            return $this->moveHuman();
+        }
 
-	/**
-	 * Get config setting for redirect
-	 *
-	 * @return bool
-	 */
-	private function getConfigRedirect()
-	{
-		if (!is_null($redirect = Config::get('crust.redirect'))) {
-			return $redirect;
-		} 
-		return false;
-	}
+        if (Auth::attempt($credential)) {
+            if (!$return) {
+                return true;
+            }
+        }
+        if (!$return) {
+            return true;
+        }
+
+        return $this->moveAuthHuman();
+    }
+
+    /**
+     * Redirect user to designated page.
+     *
+     * @return response
+     */
+    public function moveHuman()
+    {
+        return Redirect::to($this->getRedirect());
+    }
+
+    /**
+     * Check if ajax request and send response.
+     *
+     * @return response
+     */
+    private function moveAuthHuman()
+    {
+        if (Request::ajax()) {
+            return $this->moveAuthHumanAjax();
+        }
+
+        return $this->moveAuthHumanRedirect();
+    }
+
+
+    private function moveAuthHumanRedirect()
+    {
+        if (Auth::check()) {
+            return Redirect::to($this->getRedirect());
+        }
+
+        return Redirect::back()->withErrors([
+            'Username or password incorrect.',
+        ]);
+    }
+
+    /**
+     * Return json response if authentication
+     * request is ajax.
+     *
+     * @return array
+     */
+    private function moveAuthHumanAjax()
+    {
+        if (Auth::check()) {
+            return [
+                'success'  => true,
+                'redirect' => $this->getRedirect(),
+            ];
+        }
+
+        return ['success'  => false];
+    }
+
+    /**
+     * Check if user is authenticated.
+     *
+     * @return bool
+     */
+    public function isAuth()
+    {
+        if (Auth::check()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Destroy user's session.
+     *
+     * @return void
+     */
+    public function logout()
+    {
+        Auth::logout();
+
+        return $this->moveHuman();
+    }
+
+    /**
+     * Get redirect path if user successfully login.
+     *
+     * @return string
+     */
+    public function getRedirect()
+    {
+        if ($this->getHumanRole() && $this->getConfigRedirect()) {
+            foreach ($this->getConfigRedirect() as $role => $redirect) {
+                if (in_array(strtolower($role), $this->getHumanRole())) {
+                    return $redirect;
+                }
+            }
+
+            return '/';
+        }
+
+        return '/';
+    }
+
+    /**
+     * Get config setting for redirect.
+     *
+     * @return bool
+     */
+    private function getConfigRedirect()
+    {
+        if (!is_null($redirect = Config::get('crust.redirect'))) {
+            return $redirect;
+        }
+
+        return false;
+    }
 }
