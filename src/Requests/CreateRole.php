@@ -2,8 +2,8 @@
 
 namespace Crust\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRole extends FormRequest
 {
@@ -20,7 +20,8 @@ class CreateRole extends FormRequest
     /**
      * Format the errors from the given Validator instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     *
      * @return array
      */
     protected function formatErrors(Validator $validator)
@@ -36,7 +37,7 @@ class CreateRole extends FormRequest
     public function rules()
     {
         return [
-            'role_name' => 'required'
+            'role_name' => 'required',
         ];
     }
 
@@ -47,8 +48,8 @@ class CreateRole extends FormRequest
      */
     public function attributes()
     {
-       return [
-            'role_name'  => 'Role Name'
+        return [
+            'role_name'  => 'Role Name',
         ];
     }
 }

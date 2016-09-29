@@ -26,7 +26,7 @@ return [
 
     'redirect' => [
         'administrator' => '/crust',
-        'manager' => '/manager'
+        'manager'       => '/manager',
     ],
 
 ];

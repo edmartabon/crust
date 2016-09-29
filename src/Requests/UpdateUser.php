@@ -2,9 +2,8 @@
 
 namespace Crust\Requests;
 
-use Cactus;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUser extends FormRequest
 {
@@ -21,7 +20,8 @@ class UpdateUser extends FormRequest
     /**
      * Format the errors from the given Validator instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     *
      * @return array
      */
     protected function formatErrors(Validator $validator)
@@ -37,10 +37,10 @@ class UpdateUser extends FormRequest
     public function rules()
     {
         return [
-            'username'   => 'required|min:6|unique:users,username,' . $this->id,
-            'email'      => 'required|email|unique:users,email,' . $this->id,
+            'username'   => 'required|min:6|unique:users,username,'.$this->id,
+            'email'      => 'required|email|unique:users,email,'.$this->id,
             'first_name' => 'required',
-            'last_name'  => 'required'
+            'last_name'  => 'required',
         ];
     }
 
@@ -51,11 +51,11 @@ class UpdateUser extends FormRequest
      */
     public function attributes()
     {
-       return [
+        return [
             'username'  => 'Username',
             'email'     => 'Email',
             'firstname' => 'Firstname',
-            'lastname'  => 'Lastname'
+            'lastname'  => 'Lastname',
         ];
     }
 }

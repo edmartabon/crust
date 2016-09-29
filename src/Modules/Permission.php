@@ -2,164 +2,182 @@
 
 namespace Crust\Modules;
 
-use Crust\Models\CrustRole;
 use Crust\Models\CrustPermit;
+use Crust\Models\CrustRole;
 
 trait Permission
 {
+    public $role;
 
-	public $role;
+    public $permit;
 
-	public $permit;
+    /**
+     * Get user's information by id.
+     *
+     * @param int $userid
+     *
+     * @return array
+     */
+    public function getRole($roleId = null)
+    {
+        if (is_null($roleId)) {
+            $roleId = $this->role->id;
+        }
 
-	/**
-	 * Get user's information by id
-	 *
-	 * @param integer $userid
-	 * @return array
-	 */
-	public function getRole($roleId = null)
-	{
-		if (is_null($roleId)) $roleId = $this->role->id;
+        return CrustRole::find($roleId)->toArray();
+    }
 
-		return CrustRole::find($roleId)->toArray();
-	}
+    /**
+     * Get all registered users.
+     *
+     * @return array
+     */
+    public function getAllRole()
+    {
+        return CrustRole::all();
+    }
 
-	/**
-	 * Get all registered users
-	 *
-	 * @return array
-	 */
-	public function getAllRole()
-	{
-		return CrustRole::all();
-	}
+    /**
+     * Get user's information by id.
+     *
+     * @param int $userid
+     *
+     * @return array
+     */
+    public function getPermit($permit = null)
+    {
+        if (is_null($permit)) {
+            $permit = $this->permit->id;
+        }
 
-	/**
-	 * Get user's information by id
-	 *
-	 * @param integer $userid
-	 * @return array
-	 */
-	public function getPermit($permit = null)
-	{
-		if (is_null($permit)) $permit = $this->permit->id;
+        return CrustPermit::find($permit)->toArray();
+    }
 
-		return CrustPermit::find($permit)->toArray();
-	}
+    /**
+     * Get all registered permit.
+     *
+     * @return array
+     */
+    public function getAllPermit()
+    {
+        return CrustPermit::all();
+    }
 
-	/**
-	 * Get all registered permit
-	 *
-	 * @return array
-	 */
-	public function getAllPermit()
-	{
-		return CrustPermit::all();
-	}
+    /**
+     * Add new role.
+     *
+     * @param array $credential
+     *
+     * @return $this
+     */
+    public function addRole(array $credential)
+    {
+        $role = new CrustRole($credential);
+        $role->save();
 
-	/**
-	 * Add new role 
-	 *
-	 * @param array $credential
-	 * @return $this
-	 */
-	public function addRole(array $credential)
-	{
-		$role = new CrustRole($credential);
-		$role->save();
+        $this->role = $role;
 
-		$this->role = $role;
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Modify user permit codes 
-	 *
-	 * @param array $credential
-	 * @param integer $roleId
-	 * @return $this
-	 */
-	public function modifyRole(array $credential, $roleId = null)
-	{
-		if ($this->role && is_null($roleId)) $roleId = $this->role;
-		$role = CrustRole::find($roleId);
-		
-		foreach($credential as $name => $value) {
-			$role->$name = $value;
-		}
-		$role->save();
-		$this->role = $role;
-		return $this;
-	}
+    /**
+     * Modify user permit codes.
+     *
+     * @param array $credential
+     * @param int   $roleId
+     *
+     * @return $this
+     */
+    public function modifyRole(array $credential, $roleId = null)
+    {
+        if ($this->role && is_null($roleId)) {
+            $roleId = $this->role;
+        }
+        $role = CrustRole::find($roleId);
 
-	/**
-	 * Delete role
-	 *
-	 * @return void
-	 */
-	public function deleteRole($roleId)
-	{
-		CrustRole::destroy($roleId);
-	}
+        foreach ($credential as $name => $value) {
+            $role->$name = $value;
+        }
+        $role->save();
+        $this->role = $role;
 
-	/**
-	 * Add new permit
-	 *
-	 * @param array $credential
-	 * @return $this
-	 */
-	public function addPermit(array $credential)
-	{
-		$permit = new CrustPermit($credential);
-		$permit->save();
+        return $this;
+    }
 
-		$this->permit = $permit;
-		return $this;
-	}
+    /**
+     * Delete role.
+     *
+     * @return void
+     */
+    public function deleteRole($roleId)
+    {
+        CrustRole::destroy($roleId);
+    }
 
-	/**
-	 * Modify user permit codes 
-	 *
-	 * @param array $credential
-	 * @param integer $permitId
-	 * @return $this
-	 */
-	public function modifyPermit(array $credential, $permitId = null)
-	{
-		if ($this->permit && is_null($permitId)) $permitId = $this->permit;
-		$permit = CrustPermit::find($permitId);
+    /**
+     * Add new permit.
+     *
+     * @param array $credential
+     *
+     * @return $this
+     */
+    public function addPermit(array $credential)
+    {
+        $permit = new CrustPermit($credential);
+        $permit->save();
 
-		foreach($credential as $name => $value) {
-			$permit->$name = $value;
-		}
-		$permit->save();
-		$this->permit = $permit;
-		return $this;
-	}
+        $this->permit = $permit;
 
-	/**
-	 * Delete permit
-	 *
-	 * @return void
-	 */
-	public function deletePermit($permitId)
-	{
-		CrustPermit::destroy($permitId);
-	}
+        return $this;
+    }
 
-	public function getValidatePermitCodes($request, $type)
-	{
-		$permitCode = $this->getValidPermit($request, $type);
+    /**
+     * Modify user permit codes.
+     *
+     * @param array $credential
+     * @param int   $permitId
+     *
+     * @return $this
+     */
+    public function modifyPermit(array $credential, $permitId = null)
+    {
+        if ($this->permit && is_null($permitId)) {
+            $permitId = $this->permit;
+        }
+        $permit = CrustPermit::find($permitId);
 
-		return $this->getPermitCode($permitCode);
-	}
+        foreach ($credential as $name => $value) {
+            $permit->$name = $value;
+        }
+        $permit->save();
+        $this->permit = $permit;
 
-	/**
-     * Check if permit is available
+        return $this;
+    }
+
+    /**
+     * Delete permit.
+     *
+     * @return void
+     */
+    public function deletePermit($permitId)
+    {
+        CrustPermit::destroy($permitId);
+    }
+
+    public function getValidatePermitCodes($request, $type)
+    {
+        $permitCode = $this->getValidPermit($request, $type);
+
+        return $this->getPermitCode($permitCode);
+    }
+
+    /**
+     * Check if permit is available.
      *
      * @param \Illuminate\Http\Request $request
-     * @param string $type
+     * @param string                   $type
+     *
      * @return array
      */
     public function getValidPermit($request, $type)
@@ -169,23 +187,28 @@ trait Permission
                 return $request['permit_codes'][$type];
             }
         }
+
         return [];
     }
 
-	/**
-     * Get item from permit code
+    /**
+     * Get item from permit code.
      *
      * @param array $permitCode
+     *
      * @return array
      */
     private function getPermitCode(array $permitCode)
     {
         $permits = [];
         foreach ($permitCode as $permit) {
-            if (!is_array($permit)) array_push($permits, $permit);
-            else array_push($permits, $permit['permit_code']);
+            if (!is_array($permit)) {
+                array_push($permits, $permit);
+            } else {
+                array_push($permits, $permit['permit_code']);
+            }
         }
+
         return $permits;
     }
-
 }

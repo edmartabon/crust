@@ -6,12 +6,12 @@ use Crust\Contracts\HumanInterface;
 
 class LoginTemplateController
 {
+    public function login(HumanInterface $human)
+    {
+        if ($human->isAuth()) {
+            return $human->moveHuman();
+        }
 
-	public function login(HumanInterface $human)
-	{
-		if ($human->isAuth()) return $human->moveHuman();
-
-		return view('crust::pages.login');
-	}
-
+        return view('crust::pages.login');
+    }
 }

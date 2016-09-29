@@ -15,8 +15,8 @@ class Users extends Authenticatable
      * @var array
      */
     protected $dates = ['deleted_at'];
-    
-	/**
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -33,51 +33,56 @@ class Users extends Authenticatable
     /**
      * Set the user's password to hash.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return void
      */
-	public function setPasswordAttribute($value)
-	{
-		$this->attributes['password'] = \Hash::make($value);
-	}
-
-	/**
-     * Set the user's username.
-     *
-     * @param  string  $value
-     * @return void
-     */
-	public function setUsernameAttribute($value)
-	{
-		$this->attributes['username'] = strtolower($value);
-	}
-
-	/**
-     * Set the user's permit code.
-     *
-     * @param  string  $value
-     * @return void
-     */
-	public function setPermitCodesAttribute($value)
-	{
-		$this->attributes['permit_codes'] = strtolower(json_encode($value));
-	}
-
-	/**
-     * Get the user's permit code.
-     *
-     * @param  string  $value
-     * @return object
-     */
-	public function getPermitCodesAttribute($value)
-	{
-		return $this->getPermitCodesFormat($value);
-	}
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = \Hash::make($value);
+    }
 
     /**
-     * Check if user permit code is null
+     * Set the user's username.
      *
      * @param string $value
+     *
+     * @return void
+     */
+    public function setUsernameAttribute($value)
+    {
+        $this->attributes['username'] = strtolower($value);
+    }
+
+    /**
+     * Set the user's permit code.
+     *
+     * @param string $value
+     *
+     * @return void
+     */
+    public function setPermitCodesAttribute($value)
+    {
+        $this->attributes['permit_codes'] = strtolower(json_encode($value));
+    }
+
+    /**
+     * Get the user's permit code.
+     *
+     * @param string $value
+     *
+     * @return object
+     */
+    public function getPermitCodesAttribute($value)
+    {
+        return $this->getPermitCodesFormat($value);
+    }
+
+    /**
+     * Check if user permit code is null.
+     *
+     * @param string $value
+     *
      * @return object
      */
     private function getPermitCodesFormat($value)
@@ -86,26 +91,28 @@ class Users extends Authenticatable
 
         if (!is_null($value)) {
             $permitCodes = json_decode(strtolower($value));
+        } else {
+            $permitCodes = $defaultFormat;
         }
-        else $permitCodes = $defaultFormat;
 
-        if (json_last_error() == JSON_ERROR_NONE) return $permitCodes;
+        if (json_last_error() == JSON_ERROR_NONE) {
+            return $permitCodes;
+        }
 
         return $defaultFormat;
     }
 
     /**
-     * Get the default permission item
+     * Get the default permission item.
      *
-     * @return string 
+     * @return string
      */
     private function permitCodesList()
     {
         return strtolower(json_encode([
             'role'   => [],
             'permit' => [],
-            'ban'    => []
+            'ban'    => [],
         ]));
     }
-
 }

@@ -19,5 +19,4 @@ class CrustPermit extends Model
      * @var bool
      */
     public $timestamps = false;
-    
 }
