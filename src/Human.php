@@ -369,7 +369,7 @@ class Human implements HumanInterface
             }
         }
         if (!$return) {
-            return true;
+            return false;
         }
 
         return $this->moveAuthHuman();
