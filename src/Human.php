@@ -399,7 +399,6 @@ class Human implements HumanInterface
         return $this->moveAuthHumanRedirect();
     }
 
-
     private function moveAuthHumanRedirect()
     {
         if (Auth::check()) {
