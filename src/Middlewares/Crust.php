@@ -46,9 +46,13 @@ class Crust
      */
     public function handle($request, Closure $next, ...$guards)
     {
-        $this->authenticate($guards);
+        $auth = $this->authenticate($guards);
 
-        return $next($request);
+        if ($auth) {
+            return $next($request);
+        }
+        
+        return response()->json(['unAuthorized'], 401);
     }
 
     /**
@@ -134,13 +138,6 @@ class Crust
      */
     private function unAuthorized()
     {
-        if (!$this->auth->check()) {
-            throw new AuthenticationException();
-        }
-
-        if (Request::ajax()) {
-            return response('Unauthorized.', 403);
-        }
-        throw new AuthorizationException('This action is unauthorized.');
+        return false;
     }
 }
